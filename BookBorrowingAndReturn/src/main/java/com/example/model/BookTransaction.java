@@ -8,29 +8,28 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "book_transaction")
 public class BookTransaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int transactionId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int transactionId;
+	private int memberId;
+	private int bookId;
+	private LocalDate borrowDate;
+	private LocalDate dueDate;
+	private LocalDate returnDate;
+	private Integer fineId;
 
-    private int memberId;
-    private int bookId;
+	public Integer getFineId() {
+		return fineId;
+	}
 
-    private LocalDate borrowDate;
-    private LocalDate dueDate;
-    private LocalDate returnDate;
-    private Integer fineId;
+	public void setFineId(Integer fineId) {
+		this.fineId = fineId;
+	}
 
-    public Integer getFineId() {
-        return fineId;
-    }
+	@Column(name = "status")
+	private String status; // Borrowed, Returned, Overdue
 
-    public void setFineId(Integer fineId) {
-        this.fineId = fineId;
-    }
-    @Column(name = "status")
-    private String status; // Borrowed, Returned, Overdue
-    
-    public int getTransactionId() {
+	public int getTransactionId() {
 		return transactionId;
 	}
 
@@ -86,5 +85,4 @@ public class BookTransaction {
 		this.status = status;
 	}
 
-	
 }

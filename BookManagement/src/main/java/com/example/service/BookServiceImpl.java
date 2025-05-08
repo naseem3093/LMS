@@ -1,6 +1,5 @@
 package com.example.service;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -13,40 +12,39 @@ import com.example.repository.BookRepository;
 
 @Service
 public class BookServiceImpl implements BookService {
-    @Autowired
-    private BookRepository repository;
-    
-    @Override
-    public String saveBook(Book book) {
-        repository.save(book);
-        return "Book saved successfully";
-    }
+	@Autowired
+	private BookRepository repository;
 
-    @Override
-    public Book updateBook(Book book) {
-        return repository.save(book);
-    }
+	@Override
+	public String saveBook(Book book) {
+		repository.save(book);
+		return "Book saved successfully";
+	}
 
-    @Override
-    public Book getBook(int bookId) throws BookNotFound {
-        Optional<Book> optional = repository.findById(bookId);
-        if (optional.isPresent())
-            return optional.get();
-        else
-            throw new BookNotFound("Book ID is not valid");
-    }
+	@Override
+	public Book updateBook(Book book) {
+		return repository.save(book);
+	}
 
-    @Override
-    public List<Book> getAllBooks() {
-        return repository.findAll();
-    }
+	@Override
+	public Book getBook(int bookId) throws BookNotFound {
+		Optional<Book> optional = repository.findById(bookId);
+		if (optional.isPresent())
+			return optional.get();
+		else
+			throw new BookNotFound("Book ID is not valid");
+	}
 
-    @Override
-    public String deleteBook(int bookId)  {
-       // boolean isBorrowed = bookBorrowingAndReturnClient.validateBookAvailability(bookId);  // ✅ Check if the book is currently borrowed
+	@Override
+	public List<Book> getAllBooks() {
+		return repository.findAll();
+	}
 
-        repository.deleteById(bookId);  // ✅ Delete only if NOT borrowed
-        return "Book deleted successfully!";
-    }
+	@Override
+	public String deleteBook(int bookId) {
+
+		repository.deleteById(bookId);
+		return "Book deleted successfully!";
+	}
 
 }

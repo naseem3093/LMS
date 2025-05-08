@@ -19,7 +19,7 @@ public class BookTransactionController {
 	public BookTransaction borrowBook(@RequestBody BookTransaction transaction) {
 		return service.borrowBook(transaction);
 	}
-	
+
 	@PatchMapping("/return/{transactionId}")
 	public String returnBook(@PathVariable("transactionId") int transactionId) throws TransactionNotFoundException {
 		return service.returnBook(transactionId);

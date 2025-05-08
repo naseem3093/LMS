@@ -10,14 +10,11 @@ import java.util.Optional;
 import com.example.model.OverdueFine;
 
 public interface OverdueFineRepository extends JpaRepository<OverdueFine, Integer> {
-    
-    // Find fine by transaction ID
-    Optional<OverdueFine> findByTransactionId(int transactionId);
 
-    // Retrieve pending fines for payment tracking
-    List<OverdueFine> findByFineStatus(String fineStatus);
+	Optional<OverdueFine> findByTransactionId(int transactionId);
 
-    // ✅ Custom JPQL Query for Overdue Transactions
-    @Query("SELECT f FROM OverdueFine f WHERE f.fineIssuedDate < :currentDate")
-    List<OverdueFine> findOverdueTransactions(@Param("currentDate") LocalDate currentDate);
+	List<OverdueFine> findByFineStatus(String fineStatus);
+
+	@Query("SELECT f FROM OverdueFine f WHERE f.fineIssuedDate < :currentDate")
+	List<OverdueFine> findOverdueTransactions(@Param("currentDate") LocalDate currentDate);
 }

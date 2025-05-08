@@ -8,20 +8,20 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "overdue_fine")
 public class OverdueFine {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int fineId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int fineId;
 
-    private int transactionId;
-    private int memberId;
-    
-    private double fineAmount;
-    private int overdueDays;
+	private int transactionId;
+	private int memberId;
 
-    @Column(name = "fine_status")
-    private String fineStatus; // Pending, Paid
+	private double fineAmount;
+	private int overdueDays;
 
-    private LocalDate fineIssuedDate;
+	@Column(name = "fine_status")
+	private String fineStatus; // Pending, Paid
+
+	private LocalDate fineIssuedDate;
 
 	public int getFineId() {
 		return fineId;
@@ -78,5 +78,5 @@ public class OverdueFine {
 	public void setFineIssuedDate(LocalDate fineIssuedDate) {
 		this.fineIssuedDate = fineIssuedDate;
 	}
-    
+
 }

@@ -11,12 +11,13 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "member_info")
 public class Member {
-    @Id
-    @Column(name = "member_id")
-    private int memberId;
+	@Id
+	@Column(name = "member_id")
+	private int memberId;
 
-    private String name;
-    public int getMemberId() {
+	private String name;
+
+	public int getMemberId() {
 		return memberId;
 	}
 
@@ -65,10 +66,10 @@ public class Member {
 	}
 
 	private String email;
-    private String phone;
-    private String role;
-    
-    public String getRole() {
+	private String phone;
+	private String role;
+
+	public String getRole() {
 		return role;
 	}
 
@@ -77,8 +78,8 @@ public class Member {
 	}
 
 	@Column(name = "membership_status")
-    private String membershipStatus; // Active, Inactive, Expired
-    
-    @Column(name = "membership_expiry_date")
-    private LocalDate membershipExpiryDate; // Tracks membership duration
+	private String membershipStatus; // Active, Inactive, Expired
+
+	@Column(name = "membership_expiry_date")
+	private LocalDate membershipExpiryDate; // Tracks membership duration
 }

@@ -11,9 +11,9 @@ public class BookTransactionDTO {
 	private LocalDate borrowDate;
 	private LocalDate dueDate;
 	private String status; // Borrowed, Returned
+	private Integer fineId;
 
-	private Integer fineId;  // ✅ Links this transaction to a fine
-    public Integer getFineId() {
+	public Integer getFineId() {
 		return fineId;
 	}
 
@@ -30,7 +30,7 @@ public class BookTransactionDTO {
 	}
 
 	private Double fineAmount;
-    
+
 	public int getTransactionId() {
 		return transactionId;
 	}

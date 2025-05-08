@@ -13,23 +13,20 @@ import com.example.repository.BookTransactionRepository;
 
 @Service
 public class BookTransactionServiceImpl implements BookTransactionService {
-	  
+
 	@Autowired
 	private BookTransactionRepository repository;
-	
 
-    @Autowired
-    private OverdueFinesClient overdueFinesClient;
+	@Autowired
+	private OverdueFinesClient overdueFinesClient;
 
 	@Override
 	public BookTransaction borrowBook(BookTransaction transaction) {
 		// Validate Borrowing Limit (max 10 books per member)
-		long borrowedBooks = repository.countBorrowedBooks(transaction.getMemberId()); // ✅ Correct method call
+		long borrowedBooks = repository.countBorrowedBooks(transaction.getMemberId());
 		if (borrowedBooks >= 10) {
 			throw new IllegalArgumentException("Borrowing limit reached (10 books max).");
 		}
-
-		// Proceed with borrowing logic...
 		transaction.setBorrowDate(LocalDate.now());
 		transaction.setDueDate(LocalDate.now().plusDays(14));
 		transaction.setStatus("Borrowed");
@@ -39,31 +36,28 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
 	@Override
 	public String returnBook(int transactionId) throws TransactionNotFoundException {
-	    Optional<BookTransaction> optional = repository.findById(transactionId);
-	    if (optional.isPresent()) {
-	        BookTransaction transaction = optional.get();
-	        transaction.setReturnDate(LocalDate.now());
+		Optional<BookTransaction> optional = repository.findById(transactionId);
+		if (optional.isPresent()) {
+			BookTransaction transaction = optional.get();
+			transaction.setReturnDate(LocalDate.now());
 
-	        if (transaction.getReturnDate().isAfter(transaction.getDueDate())) {
-	            int fineId = overdueFinesClient.generateFine(transactionId);  // ✅ Call Overdue & Fines microservice
+			if (transaction.getReturnDate().isAfter(transaction.getDueDate())) {
+				int fineId = overdueFinesClient.generateFine(transactionId); // Call Overdue & Fines microservice
 
-	            transaction.setStatus("Overdue");
-	            transaction.setFineId(fineId);  // ✅ Directly store Fine ID in BookTransaction
+				transaction.setStatus("Overdue");
+				transaction.setFineId(fineId); // Directly store Fine ID in BookTransaction
 
-	            repository.save(transaction);
-	            return "Book returned late. Fine ID generated: " + fineId;
-	        } else {
-	            transaction.setStatus("Returned");
-	            repository.save(transaction);
-	            return "Book returned successfully!";
-	        }
-	    } else {
-	        throw new TransactionNotFoundException("Transaction ID not found.");
-	    }
+				repository.save(transaction);
+				return "Book returned late. Fine ID generated: " + fineId;
+			} else {
+				transaction.setStatus("Returned");
+				repository.save(transaction);
+				return "Book returned successfully!";
+			}
+		} else {
+			throw new TransactionNotFoundException("Transaction ID not found.");
+		}
 	}
-
-
-
 
 	@Override
 	public boolean validateBookAvailability(int bookId) {

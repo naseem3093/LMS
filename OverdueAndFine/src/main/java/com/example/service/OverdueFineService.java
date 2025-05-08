@@ -5,7 +5,7 @@ import com.example.model.OverdueFine;
 import java.util.List;
 
 public interface OverdueFineService {
-	void trackOverdueFines(); // Identify overdue books and calculate fines
+	void trackOverdueFines();
 
 	public int generateFine(int transactionId);
 

@@ -13,32 +13,32 @@ import java.util.List;
 public class OverdueFineController {
 
 	@Autowired
-    private OverdueFineService service;  // ✅ Remove FineService injection
+	private OverdueFineService service;
 
-    @PostMapping("/generate/{transactionId}")
-    public int generateFine(@PathVariable int transactionId) {
-        return service.generateFine(transactionId);  // ✅ Calls service method
-    }
+	@PostMapping("/generate/{transactionId}")
+	public int generateFine(@PathVariable int transactionId) {
+		return service.generateFine(transactionId);
+	}
 
-    @PostMapping("/trackOverdue")
-    public String trackOverdueFines() {
-        service.trackOverdueFines();
-        return "Overdue fines have been processed successfully!";
-    }
+	@PostMapping("/trackOverdue")
+	public String trackOverdueFines() {
+		service.trackOverdueFines();
+		return "Overdue fines have been processed successfully!";
+	}
 
-    @GetMapping("/{fineId}")
-    public OverdueFine getFineDetails(@PathVariable int fineId) throws FineNotFoundException {
-        return service.getFineDetails(fineId);
-    }
+	@GetMapping("/{fineId}")
+	public OverdueFine getFineDetails(@PathVariable int fineId) throws FineNotFoundException {
+		return service.getFineDetails(fineId);
+	}
 
-    @PatchMapping("/pay/{fineId}/{amountPaid}")
-    public String payFine(@PathVariable("fineId") int fineId, @PathVariable("amountPaid") double amountPaid) throws FineNotFoundException {
-        return service.payFine(fineId, amountPaid);  // ✅ Calls service method with amount
-    }
+	@PatchMapping("/pay/{fineId}/{amountPaid}")
+	public String payFine(@PathVariable("fineId") int fineId, @PathVariable("amountPaid") double amountPaid)
+			throws FineNotFoundException {
+		return service.payFine(fineId, amountPaid);
+	}
 
-
-    @GetMapping("/pending")
-    public List<OverdueFine> getPendingFines() {
-        return service.getPendingFines();
-    }
+	@GetMapping("/pending")
+	public List<OverdueFine> getPendingFines() {
+		return service.getPendingFines();
+	}
 }

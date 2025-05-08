@@ -13,55 +13,57 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
-    @Autowired
-    private RouteValidator validator;
+	@Autowired
+	private RouteValidator validator;
 
-    @Autowired
-    private JwtUtil util;
+	@Autowired
+	private JwtUtil util;
 
-    public static class Config {}
+	public static class Config {
+	}
 
-    public AuthenticationFilter() {
-        super(Config.class);
-    }
+	public AuthenticationFilter() {
+		super(Config.class);
+	}
 
-    @Override
-    public GatewayFilter apply(Config config) {
-        return (exchange, chain) -> {
-            if (validator.isSecured.test(exchange.getRequest())) {
-                if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                    return handleUnauthorized(exchange.getResponse(), "Missing authorization header");
-                }
+	@Override
+	public GatewayFilter apply(Config config) {
+		return (exchange, chain) -> {
+			if (validator.isSecured.test(exchange.getRequest())) {
+				if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+					return handleUnauthorized(exchange.getResponse(), "Missing authorization header");
+				}
 
-                String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-                if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                    authHeader = authHeader.substring(7);
-                }
+				String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+				if (authHeader != null && authHeader.startsWith("Bearer ")) {
+					authHeader = authHeader.substring(7);
+				}
 
-                try {
-                    String role = util.extractRolesFromToken(authHeader);
-                    String requestedPath = exchange.getRequest().getPath().toString();
-                    String method = exchange.getRequest().getMethod().name();
+				try {
+					String role = util.extractRolesFromToken(authHeader);
+					String requestedPath = exchange.getRequest().getPath().toString();
+					String method = exchange.getRequest().getMethod().name();
 
-                    if (!isAuthorized(role, requestedPath, method)) {
-                        return handleUnauthorized(exchange.getResponse(), "Unauthorized access to " + requestedPath);
-                    }
-                } catch (Exception e) {
-                    return handleUnauthorized(exchange.getResponse(), "Invalid token");
-                }
-            }
-            return chain.filter(exchange);
-        };
-    }
+					if (!isAuthorized(role, requestedPath, method)) {
+						return handleUnauthorized(exchange.getResponse(), "Unauthorized access to " + requestedPath);
+					}
+				} catch (Exception e) {
+					return handleUnauthorized(exchange.getResponse(), "Invalid token");
+				}
+			}
+			return chain.filter(exchange);
+		};
+	}
 
-    private boolean isAuthorized(String role, String path, String method) {
-        if ("ADMIN".equalsIgnoreCase(role)) {
-            return path.startsWith("/books") || path.startsWith("/members") || path.startsWith("/transactions") || path.startsWith("/fines");
-        } else if ("USER".equalsIgnoreCase(role)) {
-            return (path.startsWith("/books") || path.startsWith("/transactions")) && method.equalsIgnoreCase("GET");
-        }
-        return false;
-    }
+	private boolean isAuthorized(String role, String path, String method) {
+		if ("ADMIN".equalsIgnoreCase(role)) {
+			return path.startsWith("/books") || path.startsWith("/members") || path.startsWith("/transactions")
+					|| path.startsWith("/fines");
+		} else if ("USER".equalsIgnoreCase(role)) {
+			return (path.startsWith("/books") || path.startsWith("/transactions")) && method.equalsIgnoreCase("GET");
+		}
+		return false;
+	}
 //    private boolean isAuthorized(String role, String path, String method) {
 //        if ("ADMIN".equalsIgnoreCase(role)) {
 //            return true; // ✅ Allow all actions for ADMIN users
@@ -71,8 +73,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 //        return false;
 //    }
 
-    private Mono<Void> handleUnauthorized(ServerHttpResponse response, String message) {
-        response.setStatusCode(HttpStatus.FORBIDDEN);
-        return response.setComplete();
-    }
+	private Mono<Void> handleUnauthorized(ServerHttpResponse response, String message) {
+		response.setStatusCode(HttpStatus.FORBIDDEN);
+		return response.setComplete();
+	}
 }

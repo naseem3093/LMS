@@ -1,6 +1,5 @@
 package com.example.Apigateway.filter;
 
-
 import java.util.function.Predicate;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RouteValidator {
-
 
 	public static final String[] OPEN_API_ENDPOINTS = { "/auth/register", "/auth/new", "/auth/validate", "/eureka" };
 
@@ -21,8 +19,5 @@ public class RouteValidator {
 		}
 		return true; // Endpoint requires authorization
 	};
-
-	
-	
 
 }
