@@ -41,4 +41,12 @@ public class Book {
 	private String title;
     private String author;
     private String genre;
+    private String role;
+
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
 }

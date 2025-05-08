@@ -66,8 +66,17 @@ public class Member {
 
 	private String email;
     private String phone;
+    private String role;
     
-    @Column(name = "membership_status")
+    public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	@Column(name = "membership_status")
     private String membershipStatus; // Active, Inactive, Expired
     
     @Column(name = "membership_expiry_date")

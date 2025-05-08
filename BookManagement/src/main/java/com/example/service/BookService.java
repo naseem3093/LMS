@@ -16,4 +16,5 @@ public interface BookService {
 	public abstract List<Book> getAllBooks(); // Fetches all books
 
 	public abstract String deleteBook(int bookId); // Removes a book
+
 }

@@ -15,6 +15,8 @@ public interface BookTransactionRepository extends JpaRepository<BookTransaction
     // Count books borrowed by a member (to enforce borrowing limit)
     long countByMemberIdAndStatus(int memberId, String status);
 
+    boolean existsByBookIdAndStatus(int bookId, String status);  // ✅ Checks if book is borrowed
+    
     // Check if a book is currently borrowed
     long countByBookIdAndStatus(int bookId, String status);
     

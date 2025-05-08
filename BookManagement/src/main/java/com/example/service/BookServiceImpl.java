@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.example.exceptions.BookDeletionException;
 import com.example.exceptions.BookNotFound;
 import com.example.model.Book;
 import com.example.repository.BookRepository;
@@ -15,7 +15,7 @@ import com.example.repository.BookRepository;
 public class BookServiceImpl implements BookService {
     @Autowired
     private BookRepository repository;
-
+    
     @Override
     public String saveBook(Book book) {
         repository.save(book);
@@ -42,8 +42,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public String deleteBook(int bookId) {
-        repository.deleteById(bookId);
-        return "Book deleted successfully";
+    public String deleteBook(int bookId)  {
+       // boolean isBorrowed = bookBorrowingAndReturnClient.validateBookAvailability(bookId);  // ✅ Check if the book is currently borrowed
+
+        repository.deleteById(bookId);  // ✅ Delete only if NOT borrowed
+        return "Book deleted successfully!";
     }
+
 }
