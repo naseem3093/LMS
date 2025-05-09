@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.exceptions.BookDeletionException;
 import com.example.exceptions.BookNotFound;
 import com.example.model.Book;
 import com.example.repository.BookRepository;
