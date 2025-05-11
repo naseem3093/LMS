@@ -2,7 +2,6 @@ package com.example.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.exceptions.BookNotFound;
@@ -13,7 +12,7 @@ import com.example.repository.BookRepository;
 public class BookServiceImpl implements BookService {
 	@Autowired
 	private BookRepository repository;
-
+	
 	@Override
 	public String saveBook(Book book) {
 		repository.save(book);
@@ -24,6 +23,8 @@ public class BookServiceImpl implements BookService {
 	public Book updateBook(Book book) {
 		return repository.save(book);
 	}
+	
+
 
 	@Override
 	public Book getBook(int bookId) throws BookNotFound {
@@ -41,9 +42,15 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public String deleteBook(int bookId) {
-
-		repository.deleteById(bookId);
+	
+       	repository.deleteById(bookId);
 		return "Book deleted successfully!";
+	}
+
+	@Override
+	public boolean existsByBookIdAndReturnedFalse(int bookId) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

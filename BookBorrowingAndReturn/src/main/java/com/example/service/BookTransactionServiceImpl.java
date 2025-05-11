@@ -8,83 +8,94 @@ import org.springframework.stereotype.Service;
 
 import com.example.client.OverdueFinesClient;
 import com.example.exceptions.TransactionNotFoundException;
+import com.example.exceptions.BorrowingLimitExceededException;
 import com.example.model.BookTransaction;
 import com.example.repository.BookTransactionRepository;
 
 @Service
 public class BookTransactionServiceImpl implements BookTransactionService {
 
-	@Autowired
-	private BookTransactionRepository repository;
+    @Autowired
+    private BookTransactionRepository repository;
 
-	@Autowired
-	private OverdueFinesClient overdueFinesClient;
+    @Autowired
+    private OverdueFinesClient overdueFinesClient;
 
-	@Override
-	public BookTransaction borrowBook(BookTransaction transaction) {
-		// Validate Borrowing Limit (max 10 books per member)
-		long borrowedBooks = repository.countBorrowedBooks(transaction.getMemberId());
-		if (borrowedBooks >= 10) {
-			throw new IllegalArgumentException("Borrowing limit reached (10 books max).");
-		}
-		transaction.setBorrowDate(LocalDate.now());
-		transaction.setDueDate(LocalDate.now().plusDays(14));
-		transaction.setStatus("Borrowed");
+    @Override
+    public BookTransaction borrowBook(BookTransaction transaction) {
+        // Validate Borrowing Limit (max 10 books per member)
+        long borrowedBooks = repository.countBorrowedBooks(transaction.getMemberId());
+        if (borrowedBooks >= 10) {
+            throw new BorrowingLimitExceededException("Borrowing limit reached (10 books max).");
+        }
 
-		return repository.save(transaction);
-	}
+        // Validate Book Availability Before Borrowing
+        if (!validateBookAvailability(transaction.getBookId())) {
+            throw new IllegalArgumentException("Book is currently borrowed and unavailable.");
+        }
 
-	@Override
-	public String returnBook(int transactionId) throws TransactionNotFoundException {
-		Optional<BookTransaction> optional = repository.findById(transactionId);
-		if (optional.isPresent()) {
-			BookTransaction transaction = optional.get();
-			transaction.setReturnDate(LocalDate.now());
+        // Set Borrowing Dates and Default Status
+        transaction.setBorrowDate(LocalDate.now());
+        transaction.setDueDate(LocalDate.now().plusDays(14));
+        transaction.setStatus(Optional.ofNullable(transaction.getStatus()).orElse("Borrowed"));
 
-			if (transaction.getReturnDate().isAfter(transaction.getDueDate())) {
-				int fineId = overdueFinesClient.generateFine(transactionId); // Call Overdue & Fines microservice
+        return repository.save(transaction);
+    }
 
-				transaction.setStatus("Overdue");
-				transaction.setFineId(fineId); // Directly store Fine ID in BookTransaction
+    @Override
+    public String returnBook(int transactionId) throws TransactionNotFoundException {
+        Optional<BookTransaction> optional = repository.findById(transactionId);
+        if (optional.isPresent()) {
+            BookTransaction transaction = optional.get();
+            transaction.setReturnDate(LocalDate.now());
 
-				repository.save(transaction);
-				return "Book returned late. Fine ID generated: " + fineId;
-			} else {
-				transaction.setStatus("Returned");
-				repository.save(transaction);
-				return "Book returned successfully!";
-			}
-		} else {
-			throw new TransactionNotFoundException("Transaction ID not found.");
-		}
-	}
+            if (transaction.getReturnDate().isAfter(transaction.getDueDate())) {
+                applyFine(transaction); // Extracted fine handling method
+                repository.save(transaction);
+                return "Book returned late. Fine ID generated: " + transaction.getFineId();
+            } else {
+                transaction.setStatus("Returned");
+                repository.save(transaction);
+                return "Book returned successfully!";
+            }
+        } else {
+            throw new TransactionNotFoundException("Transaction ID not found.");
+        }
+    }
 
-	@Override
-	public boolean validateBookAvailability(int bookId) {
-		return repository.countByBookIdAndStatus(bookId, "Borrowed") == 0; // Available if no active loan
-	}
+    @Override
+    public boolean validateBookAvailability(int bookId) {
+        return repository.countByBookIdAndStatus(bookId, "Borrowed") == 0; // Available if no active loan
+    }
 
-	@Override
-	public List<BookTransaction> trackOverdueBooks() {
-		return repository.findByStatus("Overdue");
-	}
+    @Override
+    public List<BookTransaction> trackOverdueBooks() {
+        return repository.findByStatus("Overdue");
+    }
 
-	@Override
-	public String extendLoanPeriod(int transactionId, int extraDays) throws TransactionNotFoundException {
-		Optional<BookTransaction> optional = repository.findById(transactionId);
-		if (optional.isPresent()) {
-			BookTransaction transaction = optional.get();
-			transaction.setDueDate(transaction.getDueDate().plusDays(extraDays));
-			repository.save(transaction);
-			return "Loan period extended successfully!";
-		} else {
-			throw new TransactionNotFoundException("Transaction ID not found.");
-		}
-	}
+    @Override
+    public String extendLoanPeriod(int transactionId, int extraDays) throws TransactionNotFoundException {
+        Optional<BookTransaction> optional = repository.findById(transactionId);
+        if (optional.isPresent()) {
+            BookTransaction transaction = optional.get();
+            transaction.setDueDate(transaction.getDueDate().plusDays(extraDays));
+            repository.save(transaction);
+            return "Loan period extended successfully!";
+        } else {
+            throw new TransactionNotFoundException("Transaction ID not found.");
+        }
+    }
 
-	@Override
-	public String borrowBook(int memberId, int bookId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String borrowBook(int memberId, int bookId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    // Fine Calculation Method (Extracted from returnBook)
+    private void applyFine(BookTransaction transaction) {
+        int fineId = overdueFinesClient.generateFine(transaction.getTransactionId());
+        transaction.setStatus("Overdue");
+        transaction.setFineId(fineId);
+    }
 }
